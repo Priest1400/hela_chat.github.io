@@ -23,6 +23,20 @@ body {
     backdrop-filter: blur(10px);
 }
 
+/* 👇 فقط اضافه شد */
+.logo {
+    display: flex;
+    justify-content: center;
+    padding-top: 15px;
+}
+
+.logo img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.5));
+}
+
 #chatBox {
     flex: 1;
     padding: 15px;
@@ -94,6 +108,11 @@ button:hover {
 
 <body>
 
+<!-- 👇 فقط این اضافه شد -->
+<div class="logo">
+    <img src="logo.png" alt="logo">
+</div>
+
 <div class="header">💬 Global Chat</div>
 
 <div id="chatBox"></div>
@@ -125,7 +144,6 @@ ws.onmessage = function(event) {
     const chatBox = document.getElementById("chatBox");
     chatBox.appendChild(div);
 
-    // auto scroll پایین
     chatBox.scrollTop = chatBox.scrollHeight;
 };
 

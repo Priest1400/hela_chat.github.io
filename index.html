@@ -1,10 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Simurgh Chat</title>
+
+<style>
+
+body{
+    margin:0;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-family:Arial, sans-serif;
+    background:linear-gradient(135deg,#141e30,#243b55);
+}
+
+.container{
+    width:400px;
+    padding:40px;
+    border-radius:25px;
+    text-align:center;
+    color:white;
+
+    background:rgba(255,255,255,0.06);
+    backdrop-filter:blur(15px);
+
+    box-shadow:0 10px 40px rgba(0,0,0,0.4);
+}
+
+/* LOGO */
+.logo-img{
+    width:300px;
+    height:300px;
+    object-fit:contain;
+    margin-bottom:15px;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.6));
+}
+
+h1{
+    margin:0;
+    font-size:32px;
+}
+
+.subtitle{
+    margin-top:10px;
+    margin-bottom:35px;
+    color:#d0d0d0;
+    font-size:14px;
+}
+
+.button{
+    display:block;
+    width:100%;
+    padding:15px;
+    margin-top:15px;
+
+    border:none;
+    border-radius:14px;
+
+    color:white;
+    text-decoration:none;
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
+    transition:0.3s;
+    box-sizing:border-box;
+}
+
+.login-btn{
+    background:linear-gradient(90deg,#00c6ff,#0072ff);
+}
+
+.register-btn{
+    background:linear-gradient(90deg,#ff6ec4,#7873f5);
+}
+
+.button:hover{
+    transform:scale(1.03);
+}
+
+.footer{
+    margin-top:25px;
+    font-size:12px;
+    color:#aaaaaa;
+}
+
+.top-bar{
+    margin-bottom:10px;
+}
+
+</style>
 </head>
+
 <body>
-$END$
+
+<div class="container">
+
+    <!-- LOGO -->
+    <div class="top-bar">
+        <img src="logo.png" class="logo-img" alt="logo">
+    </div>
+
+    <h1>Simurgh Chat</h1>
+
+    <div class="subtitle">
+        Fast • Secure • Realtime Messaging
+    </div>
+
+    <a href="login.html" class="button login-btn">
+        🔑 Login
+    </a>
+
+    <a href="register.html" class="button register-btn">
+        ✨ Register
+    </a>
+
+    <div class="footer">
+        Welcome to Simurgh Messenger
+    </div>
+
+</div>
+
 </body>
 </html>
