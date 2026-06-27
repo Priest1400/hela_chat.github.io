@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Private Chat</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#141e30,#243b55);
+    height:100vh;
+    display:flex;
+}
+
+/* SIDEBAR */
+#onlineBox{
+    width:220px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(15px);
+    padding:15px;
+    color:white;
+    overflow-y:auto;
+}
+
+.online-user{
+    padding:10px;
+    margin-top:8px;
+    background:rgba(255,255,255,0.08);
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.online-user:hover{
+    background:rgba(255,255,255,0.18);
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* USER INFO */
+#userInfo{
+    position:fixed;
+    top:15px;
+    right:15px;
+    background:rgba(255,255,255,0.08);
+    backdrop-filter:blur(10px);
+    padding:10px 15px;
+    border-radius:12px;
+    color:white;
+}
+
+/* CHAT BOX */
+.chat-container{
+    width:420px;
+    height:700px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(15px);
+    border-radius:25px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.header{
+    padding:20px;
+    color:white;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+}
+
+/* receiver */
+.receiver-box{
+    padding:15px;
+}
+
+.receiver-box input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    outline:none;
+}
+
+/* chat messages */
+#chatBox{
+    flex:1;
+    padding:15px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.message{
+    padding:12px 15px;
+    border-radius:14px;
+    max-width:75%;
+    word-wrap:break-word;
+    color:white;
+}
+
+.me{
+    align-self:flex-end;
+    background:linear-gradient(90deg,#00c6ff,#0072ff);
+}
+
+.other{
+    align-self:flex-start;
+    background:rgba(255,255,255,0.08);
+}
+
+/* input */
+.input-area{
+    display:flex;
+    padding:15px;
+    gap:10px;
+}
+
+.input-area input{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+    outline:none;
+}
+
+.input-area button{
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    background:linear-gradient(90deg,#00c6ff,#0072ff);
+    color:white;
+    cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ONLINE LIST -->
+<div id="onlineBox">
+    <h3>🟢 Online</h3>
+</div>
+
+<!-- MAIN CHAT -->
+<div class="main">
+
+<div class="chat-container">
+
+    <div class="header">🔒 Private Chat</div>
+
+    <div class="receiver-box">
+        <input id="receiver" placeholder="Select user...">
+    </div>
+
+    <div id="chatBox"></div>
+
+    <div class="input-area">
+        <input id="message" placeholder="Type message...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+</div>
+
+</div>
+
+<!-- USER INFO -->
+<div id="userInfo">Loading...</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+let currentUser = "";
+
+/* GET USER INFO */
+async function loadUserInfo(){
+
+    const res = await fetch("http://127.0.0.1:8000/me",{
+        headers:{
+            Authorization:"Bearer " + token
+        }
+    });
+
+    const data = await res.json();
+
+    currentUser = data.username;
+
+    document.getElementById("userInfo").innerHTML =
+        `👤 ${currentUser} 🟢 Online`;
+}
+
+loadUserInfo();
+
+/* WEBSOCKET */
+const ws = new WebSocket(
+    "ws://127.0.0.1:8000/chat/pv/ws?token=" + token
+);
+
+ws.onmessage = function(event){
+
+    try{
+        const data = JSON.parse(event.data);
+
+        if(data.type === "online_users"){
+            updateOnline(data.users);
+            return;
+        }
+
+    }catch(e){
+        addMessage(event.data,false);
+    }
+};
+
+/* ONLINE USERS LIST */
+function updateOnline(users){
+
+    const box = document.getElementById("onlineBox");
+
+    box.innerHTML = "<h3>🟢 Online</h3>";
+
+    users = [...new Set(users)];
+
+    users.forEach(u => {
+
+        const div = document.createElement("div");
+        div.className = "online-user";
+
+        // 👇 خود کاربر
+        if(u === currentUser){
+            div.innerText = u + " (You)";
+            div.style.opacity = "0.5";
+            div.style.cursor = "default";
+            box.appendChild(div);
+            return;
+        }
+
+        div.innerText = u;
+
+        div.onclick = function(){
+            document.getElementById("receiver").value = u;
+            loadHistory();
+        };
+
+        box.appendChild(div);
+    });
+}
+
+/* ADD MESSAGE */
+function addMessage(text,isMe){
+
+    const div = document.createElement("div");
+    div.classList.add("message");
+    div.classList.add(isMe ? "me" : "other");
+    div.innerText = text;
+
+    const box = document.getElementById("chatBox");
+
+    box.appendChild(div);
+    box.scrollTop = box.scrollHeight;
+}
+
+/* SEND MESSAGE */
+function sendMessage(){
+
+    const receiver = document.getElementById("receiver").value;
+    const message = document.getElementById("message").value;
+
+    if(!receiver || !message) return;
+
+    ws.send(JSON.stringify({
+        receiver:receiver,
+        content:message
+    }));
+
+    addMessage("You: " + message,true);
+
+    document.getElementById("message").value = "";
+}
+
+/* LOAD HISTORY */
+async function loadHistory(){
+
+    const receiver = document.getElementById("receiver").value;
+
+    if(!receiver) return;
+
+    const res = await fetch(
+        "http://127.0.0.1:8000/chat/pv/history/" + receiver,
+        {
+            headers:{
+                Authorization:"Bearer " + token
+            }
+        }
+    );
+
+    const messages = await res.json();
+
+    const box = document.getElementById("chatBox");
+    box.innerHTML = "";
+
+    messages.forEach(msg => {
+
+        const isMe = msg.sender === currentUser;
+
+        addMessage(msg.sender + ": " + msg.content, isMe);
+    });
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Global Chat</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: linear-gradient(135deg, #141e30, #243b55);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    padding: 15px;
+    color: white;
+    text-align: center;
+    font-size: 20px;
+    background: rgba(255,255,255,0.05);
+    backdrop-filter: blur(10px);
+}
+
+#chatBox {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    color: white;
+}
+
+.message {
+    background: rgba(255,255,255,0.08);
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 12px;
+    max-width: 70%;
+    word-wrap: break-word;
+}
+
+.inputBox {
+    display: flex;
+    padding: 10px;
+    background: rgba(255,255,255,0.05);
+}
+
+input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+button {
+    margin-left: 10px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+/* دکمه رفتن به PV */
+.pvButton {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    padding: 14px 20px;
+    border-radius: 50px;
+    background: linear-gradient(90deg, #ff6ec4, #7873f5);
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 0 0 20px rgba(0,0,0,0.3);
+    transition: 0.3s;
+}
+
+.pvButton:hover {
+    transform: scale(1.08);
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="header">💬 Global Chat</div>
+
+<div id="chatBox"></div>
+
+<div class="inputBox">
+    <input id="message" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+<!-- دکمه رفتن به چت خصوصی -->
+<a href="pv_chat.html" class="pvButton">
+    🔒 Private Chat
+</a>
+
+<script>
+
+const token = localStorage.getItem("token");
+
+const ws = new WebSocket(
+    "ws://127.0.0.1:8000/chat/ws?token=" + token
+);
+
+ws.onmessage = function(event) {
+
+    const div = document.createElement("div");
+    div.className = "message";
+    div.innerText = event.data;
+
+    const chatBox = document.getElementById("chatBox");
+    chatBox.appendChild(div);
+
+    // auto scroll پایین
+    chatBox.scrollTop = chatBox.scrollHeight;
+};
+
+function sendMessage() {
+
+    const input = document.getElementById("message");
+    const message = input.value;
+
+    if (!message) return;
+
+    ws.send(message);
+    input.value = "";
+}
+
+</script>
+
+</body>
+</html>

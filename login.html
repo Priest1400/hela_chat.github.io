@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Login</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #1e1e2f, #2c3e50);
+    }
+
+    .container {
+        background: rgba(255, 255, 255, 0.08);
+        padding: 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        backdrop-filter: blur(10px);
+        width: 320px;
+        text-align: center;
+        color: white;
+    }
+
+    h2 {
+        margin-bottom: 10px;
+        font-size: 28px;
+    }
+
+    .title {
+        font-size: 12px;
+        opacity: 0.7;
+        margin-bottom: 20px;
+    }
+
+    input {
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: none;
+        border-radius: 10px;
+        outline: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+    }
+
+    input::placeholder {
+        color: #ccc;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 12px;
+        border: none;
+        border-radius: 10px;
+        background: linear-gradient(90deg, #00c6ff, #0072ff);
+        color: white;
+        font-size: 15px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 114, 255, 0.6);
+    }
+
+    .register-btn {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.3);
+        margin-top: 10px;
+    }
+
+    .register-btn:hover {
+        background: rgba(255,255,255,0.1);
+    }
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <h2>Welcome Back</h2>
+    <div class="title">Login to continue</div>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <button onclick="login()">Login</button>
+
+    <!-- 👇 NEW REGISTER BUTTON -->
+    <button class="register-btn" onclick="goRegister()">
+        Create account
+    </button>
+
+</div>
+
+<script>
+
+async function login() {
+
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    const res = await fetch("http://127.0.0.1:8000/login", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            username: username,
+            password: password
+        })
+    });
+
+    const data = await res.json();
+
+    if (data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        alert("Login successful 🚀");
+        window.location.href = "chat.html";
+    } else {
+        alert("Login failed ❌");
+    }
+}
+
+/* 👇 redirect to register page */
+function goRegister(){
+    window.location.href = "register.html";
+}
+
+</script>
+
+</body>
+</html>
